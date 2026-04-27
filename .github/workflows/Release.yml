@@ -29,13 +29,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          files: dist/blessing-skin-server-${{ github.ref_name }}.zip
+          files: ./blessing-skin-server-${{ github.ref_name }}.zip
           prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: blessing-skin-server
-          path: dist/blessing-skin-server-${{ github.ref_name }}.zip
