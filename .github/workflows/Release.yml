@@ -11,7 +11,7 @@ jobs:
 
     permissions:
       contents: write
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,23 +19,28 @@ jobs:
       - name: Build and create archive
         run: ./tools/release.ps1
         shell: pwsh
-
-      - name: Get version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          files: ./blessing-skin-server-${{ github.ref_name }}.zip
-          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+        
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
         with:
-          name: blessing-skin-server
-          path: blessing-skin-server-${{ github.ref_name }}.zip
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+      
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+     
+      - name: Upload release asset
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./blessing-skin-server-${{ steps.get_version.outputs.VERSION }}.zip
+          asset_name: blessing-skin-server-${{ steps.get_version.outputs.VERSION }}.zip
+          asset_content_type: application/zip
