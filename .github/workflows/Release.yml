@@ -14,8 +14,6 @@ jobs:
       - name: Build and create archive
         run: ./tools/release.ps1
         shell: pwsh
-        env:
-          AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
