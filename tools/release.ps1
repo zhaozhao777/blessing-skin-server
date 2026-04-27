@@ -1,6 +1,3 @@
-$manifest = Invoke-WebRequest 'https://dev.azure.com/blessing-skin/51010f6d-9f99-40f1-a262-0a67f788df32/_apis/git/repositories/a9ff8df7-6dc3-4ff8-bb22-4871d3a43936/Items?path=%2Fupdate.json' | ConvertFrom-Json
-$last = $manifest.latest
-$current = (Get-Content package.json | ConvertFrom-Json).version
 
 # Install dependencies
 composer install --no-dev --prefer-dist --no-progress
@@ -17,8 +14,4 @@ New-Item dist -ItemType Directory
 Set-Location dist
 Copy-Item -Path "../$zip" -Destination $zip
 
-$manifest.latest = $current
-$manifest.url = $manifest.url.Replace($last, $current)
-$manifest.php = '8.1.0'
-ConvertTo-Json $manifest | Out-File -FilePath update.json
 Write-Host "Update source is prepared." -ForegroundColor Green
